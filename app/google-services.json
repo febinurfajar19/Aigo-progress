@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "571195347343",
+    "project_id": "aigo-1b809",
+    "storage_bucket": "aigo-1b809.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571195347343:android:4dd6c282bdbbe565eb3bfa",
+        "android_client_info": {
+          "package_name": "com.example.aigo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571195347343-jehcomlrr8gl5557i110bjnel83opm7j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.aigo",
+            "certificate_hash": "091012e327e8405bddfb1faab784df1cecdb83a2"
+          }
+        },
+        {
+          "client_id": "571195347343-qc61kbcf7devocuqondmdt2lpfb5f9ev.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXoXGEM_yzldK2t39ltn7P6HgQwrtNhzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571195347343-qc61kbcf7devocuqondmdt2lpfb5f9ev.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
