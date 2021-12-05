@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.example.aigo.MainActivity
 import com.example.aigo.R
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
