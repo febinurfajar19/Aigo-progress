@@ -18,9 +18,9 @@ class AppConstant {
         val placesName =
             listOf<PlaceModel>(
                 PlaceModel(1, R.drawable.ic_restaurant, "Restaurant", "restaurant"),
-                PlaceModel(4, R.drawable.ic_atm, "ATM", "atm"),
-                PlaceModel(3, R.drawable.ic_shopping_cart, "Groceries", "supermarket"),
                 PlaceModel(2, R.drawable.ic_hotel, "Hotels", "hotel"),
+                PlaceModel(3, R.drawable.ic_shopping_cart, "Attractions", "attraction"),
+//                PlaceModel(2, R.drawable.ic_hotel, "Hotels", "hotel"),
                 //PlaceModel(5, R.drawable.ic_gas_station, "Gas", "gas_station"),
                 //PlaceModel(6, R.drawable.ic_pharmacy, "Pharmacies", "pharmacy"),
                 //PlaceModel(7, R.drawable.ic_hospital, "Hospitals & Clinics", "hospital"),

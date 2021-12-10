@@ -4,14 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".Activities.SignUpActivity">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="1"
-        android:scaleType="centerCrop"
-        android:src="@drawable/signup_background" />
 
     <ImageView
         android:id="@+id/btnBack"
@@ -20,7 +15,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="?actionBarSize"
         android:src="@drawable/quantum_ic_arrow_back_grey600_24"
-        app:tint="@color/white" />
+        app:tint="@color/primaryColor2" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,20 +25,17 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="110dp"
             android:layout_weight="0.8"
             android:gravity="bottom|center"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="Aigo"
-                android:textColor="@color/white"
-                android:textSize="40dp"
-                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="110dp"
+                android:layout_height="55dp"
+                android:alpha="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/logo_aigo_low" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgPick"
@@ -65,14 +57,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="30dp"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@color/primaryColor2"
                 android:drawableStart="@drawable/ic_person"
                 android:drawablePadding="10dp"
-                android:drawableTint="@color/white"
+                android:drawableTint="@color/primaryColor2"
                 android:hint="Username"
                 android:inputType="text"
                 android:maxLines="1"
-                android:textColor="@color/white" />
+                android:textColorHint="@color/primaryColor2" />
 
             <EditText
                 android:id="@+id/edtEmail"
@@ -80,14 +72,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@color/primaryColor2"
                 android:drawableStart="@drawable/ic_email"
                 android:drawablePadding="10dp"
-                android:drawableTint="@color/white"
+                android:drawableTint="@color/primaryColor2"
                 android:hint="Email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
-                android:textColor="@color/white" />
+                android:textColorHint="@color/primaryColor2" />
 
             <EditText
                 android:id="@+id/edtPassword"
@@ -95,26 +87,26 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="@color/white"
+                android:backgroundTint="@color/primaryColor2"
                 android:drawableStart="@drawable/ic_pass"
                 android:drawablePadding="10dp"
-                android:drawableTint="@color/white"
+                android:drawableTint="@color/primaryColor2"
                 android:hint="Password"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:textColor="@color/white" />
+                android:textColorHint="@color/primaryColor2" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSignUp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
+                android:backgroundTint="@color/primaryColor3"
                 android:layout_marginTop="10dp"
                 android:padding="15dp"
                 android:text="SignUp"
-                android:textStyle="bold"
                 app:cornerRadius="20dp"
-                android:textColor="@color/quantum_grey"
+                android:textColor="@color/white"
                 app:elevation="10dp" />
 
             <TextView
@@ -125,7 +117,7 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:text="@string/login_string"
-                android:textColor="@color/white"
+                android:textColor="@color/primaryColor2"
                 android:textSize="20sp" />
         </LinearLayout>
 

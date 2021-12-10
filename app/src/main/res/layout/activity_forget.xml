@@ -4,15 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primaryColor"
+    android:background="@color/white"
     tools:context=".Activities.ForgetActivity">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="1"
-        android:scaleType="centerCrop"
-        android:src="@drawable/forget_background" />
 
     <ImageView
         android:id="@+id/btnBack"
@@ -21,41 +15,57 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="?actionBarSize"
         android:src="@drawable/quantum_ic_arrow_back_grey600_24"
-        app:tint="@color/white" />
+        app:tint="@color/primaryColor2" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="310dp"
+            android:layout_weight="0.8"
+            android:gravity="center"
+            android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/edtFEmail"
+
+            <ImageView
+                android:layout_width="110dp"
+                android:layout_height="55dp"
+                android:alpha="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/logo_aigo_low" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:backgroundTint="@color/white"
-            android:drawableStart="@drawable/ic_email"
-            android:drawablePadding="10dp"
-            android:drawableTint="@color/white"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"
-            android:textColor="@color/white" />
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+            <EditText
+                android:id="@+id/edtFEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:backgroundTint="@color/primaryColor2"
+                android:drawableStart="@drawable/ic_email"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/primaryColor2"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:textColorHint="@color/primaryColor2" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnForgetPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginTop="10dp"
-            android:padding="15dp"
-            android:text="Done"
-            android:textStyle="bold"
-            app:cornerRadius="20dp"
-            android:textColor="@color/quantum_grey"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnForgetPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:backgroundTint="@color/primaryColor3"
+                android:layout_marginTop="10dp"
+                android:padding="15dp"
+                android:textStyle="bold"
+                android:text="SEND"
+                app:cornerRadius="20dp"
+            android:textColor="@color/white"
             app:elevation="10dp" />
     </LinearLayout>
-
 
 </RelativeLayout>

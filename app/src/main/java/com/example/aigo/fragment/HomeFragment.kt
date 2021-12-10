@@ -1,7 +1,9 @@
 package com.example.aigo.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -23,15 +25,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SnapHelper
+import com.example.aigo.Activities.DirectionActivity
 import com.example.aigo.LocationViewModel
 import com.example.aigo.R
+import com.example.aigo.adapter.InfoWindowAdapter
 import com.example.aigo.constant.AppConstant
 import com.example.aigo.databinding.FragmentHomeBinding
+import com.example.aigo.interfaces.NearLocationInterface
 import com.example.aigo.model.googlePlaceModel.GooglePlaceModel
 import com.example.aigo.model.googlePlaceModel.GoogleResponseModel
 import com.example.aigo.permissions.AppPermissions
 import com.example.aigo.utility.LoadingDialog
 import com.example.aigo.utility.State
+import com.example.nearmekotlindemo.adapter.GooglePlaceAdapter
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -39,14 +49,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.api.ResourceProto.resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 
-class HomeFragment : Fragment(), OnMapReadyCallback {
+class HomeFragment : Fragment(), OnMapReadyCallback, NearLocationInterface, GoogleMap.OnMarkerClickListener {
 
     private lateinit var binding: FragmentHomeBinding
     private var mGoogleMap: GoogleMap? = null
@@ -58,13 +70,16 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
-    private lateinit var currentLocation:Location
+    private lateinit var currentLocation: Location
     private var currentMarker: Marker? = null
     private lateinit var firebaseAuth: FirebaseAuth
     private var isTrafficEnable: Boolean = false
     private var radius = 1500
     private val locationViewModel: LocationViewModel by viewModels<LocationViewModel>()
     private lateinit var googlePlaceList: ArrayList<GooglePlaceModel>
+    private lateinit var googlePlaceAdapter: GooglePlaceAdapter
+//    private var userSavedLocationId: ArrayList<String> = ArrayList()
+    private var infoWindowAdapter: InfoWindowAdapter? = null
 
 
     override fun onCreateView(
@@ -75,7 +90,6 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         return binding.root
     }
 
-    @InternalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -106,8 +120,8 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
             val chip = Chip(requireContext())
             chip.text = placeModel.name
             chip.id = placeModel.id
-            chip.setPadding(5, 5, 5, 5)
-            chip.setTextColor(resources.getColor(R.color.primaryColor, null))
+            chip.setPadding(2, 2, 2, 2)
+            chip.setTextColor(resources.getColor(R.color.primaryColor2, null))
             chip.chipBackgroundColor = resources.getColorStateList(R.color.white, null)
             chip.chipIcon = ResourcesCompat.getDrawable(resources, placeModel.drawableId, null)
             chip.isCheckable = true
@@ -159,6 +173,11 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                 getNearByPlace(placeModel.placeType)
             }
         }
+
+        setUpRecyclerView()
+
+//        userSavedLocationId=locationViewModel.getUserLocationId()
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -197,6 +216,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         permissionLauncher.launch(permissionToRequest.toTypedArray())
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     private fun setUpGoogleMap() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
@@ -211,6 +231,7 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         }
         mGoogleMap?.isMyLocationEnabled = true
         mGoogleMap?.uiSettings?.isTiltGesturesEnabled = true
+        mGoogleMap?.setOnMarkerClickListener(this)
 
         setUpLocationUpdate()
     }
@@ -279,6 +300,9 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener {
 
             currentLocation = it
+            infoWindowAdapter = null
+            infoWindowAdapter = InfoWindowAdapter(currentLocation, requireContext())
+            mGoogleMap?.setInfoWindowAdapter(infoWindowAdapter)
             moveCameraToLocation(currentLocation)
         }.addOnFailureListener {
             Toast.makeText(requireContext(), "$it", Toast.LENGTH_SHORT).show()
@@ -288,13 +312,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
     private fun moveCameraToLocation(location: Location) {
         val cameraUpdate = CameraUpdateFactory.newLatLngZoom(
             LatLng(
-                -6.9730017,
-                107.6294967
+                37.5652894,
+                126.849462
             ), 17f
         )
 
         val markerOption = MarkerOptions()
-            .position(LatLng(-6.9730017, 107.6294967))
+            .position(LatLng(37.5652894, 126.849462))
             .title("Current Location")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
             .snippet(firebaseAuth.currentUser?.displayName)
@@ -351,9 +375,13 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
                             mGoogleMap?.clear()
 
                             for (i in googleResponseModel.googlePlaceModelList.indices) {
+
+//                               googleResponseModel.googlePlaceModelList[i].saved =
+//                                    userSavedLocationId.contains(googleResponseModel.googlePlaceModelList[i].placeId)
                                 googlePlaceList.add(googleResponseModel.googlePlaceModelList[i])
                                 addMarker(googleResponseModel.googlePlaceModelList[i], i)
                             }
+                            googlePlaceAdapter.setGooglePlaces(googlePlaceList)
 
                         } else {
                             mGoogleMap?.clear()
@@ -399,5 +427,152 @@ class HomeFragment : Fragment(), OnMapReadyCallback {
         val canvas = Canvas(bitmap)
         background.draw(canvas)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    private fun setUpRecyclerView() {
+        val snapHelper: SnapHelper = PagerSnapHelper()
+        googlePlaceAdapter = GooglePlaceAdapter(this)
+
+        binding.placesRecyclerView.apply {
+            layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+            setHasFixedSize(false)
+            adapter = googlePlaceAdapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val linearManager = recyclerView.layoutManager as LinearLayoutManager
+                    val position = linearManager.findFirstCompletelyVisibleItemPosition()
+                    if (position > -1) {
+                        val googlePlaceModel: GooglePlaceModel = googlePlaceList[position]
+                        mGoogleMap?.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(
+                                    googlePlaceModel.geometry?.location?.lat!!,
+                                    googlePlaceModel.geometry.location.lng!!
+                                ), 20f
+                            )
+                        )
+                    }
+                }
+            })
+        }
+
+        snapHelper.attachToRecyclerView(binding.placesRecyclerView)
+    }
+
+    override fun onSaveClick(googlePlaceModel: GooglePlaceModel) {
+//            if (userSavedLocationId.contains(googlePlaceModel.placeId)) {
+//                AlertDialog.Builder(requireContext())
+//                    .setTitle("Remove Place")
+//                    .setMessage("Are you sure to remove this place?")
+//                    .setPositiveButton("Yes") { _, _ ->
+//                        removePlace(googlePlaceModel)
+//                    }
+//                    .setNegativeButton("No") { _, _ -> }
+//                    .create().show()
+//            } else {
+//                addPlace(googlePlaceModel)
+//
+//            }
+    }
+
+//    private fun addPlace(googlePlaceModel: GooglePlaceModel) {
+//        lifecycleScope.launchWhenStarted {
+//            locationViewModel.addUserPlace(googlePlaceModel, userSavedLocationId).collect {
+//                when (it) {
+//                    is State.Loading -> {
+//                        if (it.flag == true) {
+//                            loadingDialog.startLoading()
+//                        }
+//                    }
+//
+//                    is State.Success -> {
+//                        loadingDialog.stopLoading()
+//                        val placeModel: GooglePlaceModel = it.data as GooglePlaceModel
+//                        userSavedLocationId.add(placeModel.placeId!!)
+//                        val index = googlePlaceList.indexOf(placeModel)
+//                        googlePlaceList[index].saved = true
+//                        googlePlaceAdapter.notifyDataSetChanged()
+//                        Snackbar.make(binding.root, "Saved Successfully", Snackbar.LENGTH_SHORT)
+//                            .show()
+//
+//                    }
+//                    is State.Failed -> {
+//                        loadingDialog.stopLoading()
+//                        Snackbar.make(
+//                            binding.root, it.error,
+//                            Snackbar.LENGTH_SHORT
+//                        ).show()
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+//    @SuppressLint("ShowToast")
+//    private fun removePlace(googlePlaceModel: GooglePlaceModel) {
+//        userSavedLocationId.remove(googlePlaceModel.placeId)
+//        val index = googlePlaceList.indexOf(googlePlaceModel)
+//        googlePlaceList[index].saved = false
+//        googlePlaceAdapter.notifyDataSetChanged()
+//
+//        Snackbar.make(binding.root, "Place removed", Snackbar.LENGTH_LONG)
+//            .setAction("Undo") {
+//                userSavedLocationId.add(googlePlaceModel.placeId!!)
+//                googlePlaceList[index].saved = true
+//                googlePlaceAdapter.notifyDataSetChanged()
+//            }
+//            .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar?>() {
+//                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+//                    super.onDismissed(transientBottomBar, event)
+//                    lifecycleScope.launchWhenStarted {
+//                        locationViewModel.removePlace(userSavedLocationId).collect {
+//                            when (it) {
+//                                is State.Loading -> {
+//
+//                                }
+//
+//                                is State.Success -> {
+//                                    Snackbar.make(
+//                                        binding.root,
+//                                        it.data.toString(),
+//                                        Snackbar.LENGTH_SHORT
+//                                    ).show()
+//
+//                                }
+//                                is State.Failed -> {
+//                                    Snackbar.make(
+//                                        binding.root, it.error,
+//                                        Snackbar.LENGTH_SHORT
+//                                    ).show()
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            })
+//            .show()
+//    }
+
+    override fun onDirectionClick(googlePlaceModel: GooglePlaceModel) {
+        val placeId = googlePlaceModel.placeId
+        val lat = googlePlaceModel.geometry?.location?.lat
+        val lng = googlePlaceModel.geometry?.location?.lng
+        val intent = Intent(requireContext(), DirectionActivity::class.java)
+        intent.putExtra("placeId", placeId)
+        intent.putExtra("lat", lat)
+        intent.putExtra("lng", lng)
+
+        startActivity(intent)
+    }
+
+    override fun onMarkerClick(marker: Marker): Boolean {
+        val markerTag = marker.tag as Int
+        Log.d("TAG", "onMarkerClick: $markerTag")
+//        binding.placesRecyclerView.scrollToPosition(markerTag)
+        return false
     }
 }
